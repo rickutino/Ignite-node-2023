@@ -12,4 +12,5 @@ export const config: Knex.Config = {
   },
 }
 
+// npm run knex -- migrate:latest
 export const knex = setupKnex(config)
