@@ -2,16 +2,14 @@
 // EsNodule => import/export
 import http from "node:http";
 import { Transform } from "node:stream";
-import { randomUUID } from "node:crypto";
 
 import dotenv from 'dotenv';
 import { json } from "./middlewares/json.js";
-import { Database } from "./database.js";
+import { routes } from "./routes.js";
 
 dotenv.config();
 
 const port = process.env.PORT;
-const database = new Database();
 
 class InverseNumberStream extends Transform {
   _transform(chunk, encoding, callback) {
@@ -25,33 +23,18 @@ class InverseNumberStream extends Transform {
 
 const server = http.createServer(async (req, res) => {
   const { method, url } = req;
-
+  
   await json(req, res)
+  
+  const route = routes.find(route => {
+    return route.method === method && route.path === url
+  })
 
-  if(method === 'POST' && url === '/users') {
-    const {name, email} = req.body;
-    if(name === '' || email === '') {
-      return res.writeHead(400).end("Missing body with email and name.");
-    }
-
-    const user = {
-      id: randomUUID(),
-      name,
-      email,
-    }
-
-    database.insert('users', user);
-
-    return res.writeHead(201).end();
+  if(route) {
+    return route.handler(req,res)
   }
 
-  if(method === 'GET' && url === '/users') {
-    const users = database.select('users');
-
-    return res.end(JSON.stringify(users))
-  }
-
-  return res.end(body);
+  return res.writeHead(404).end()
 })
 
 server.listen(port, (() => {
