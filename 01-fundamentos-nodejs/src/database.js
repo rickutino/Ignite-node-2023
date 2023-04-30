@@ -32,4 +32,28 @@ export class Database {
 
     return data; 
   }
+
+  update(table, id, name, email) {
+    const rowIndex = this.#database[table].findIndex(row => row.id === id)
+
+    if(rowIndex > -1) {
+      this.#database[table][rowIndex] = { id, name, email }
+      this.#persist();
+
+      return this.#database[table][rowIndex];
+    }
+
+    return rowIndex
+  }
+
+  delete(table, id) {
+    const rowIndex = this.#database[table].findIndex(row => row.id === id)
+
+    if(rowIndex > -1) {
+      this.#database[table].splice(rowIndex, 1)
+      this.#persist();
+    }
+
+    return rowIndex
+  }
 }
