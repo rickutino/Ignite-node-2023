@@ -4,8 +4,8 @@ import { randomUUID } from 'node:crypto'
 import { knex } from '../database'
 import { checkSessionIdExists } from '../middlewares/check-session-id-exists'
 
-export async function transactionsRoutes(server: FastifyInstance) {
-  server.get(
+export async function transactionsRoutes(app: FastifyInstance) {
+  app.get(
     '/',
     {
       preHandler: [checkSessionIdExists],
@@ -20,7 +20,7 @@ export async function transactionsRoutes(server: FastifyInstance) {
     },
   )
 
-  server.get(
+  app.get(
     '/:id',
     {
       preHandler: [checkSessionIdExists],
@@ -46,7 +46,7 @@ export async function transactionsRoutes(server: FastifyInstance) {
     },
   )
 
-  server.get(
+  app.get(
     '/summary',
     {
       preHandler: [checkSessionIdExists],
@@ -62,7 +62,7 @@ export async function transactionsRoutes(server: FastifyInstance) {
     },
   )
 
-  server.post('/', async (request, reply) => {
+  app.post('/', async (request, reply) => {
     const createTransactionBodySchema = z.object({
       title: z.string(),
       amount: z.number(),
